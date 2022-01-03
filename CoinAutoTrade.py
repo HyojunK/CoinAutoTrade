@@ -2,6 +2,9 @@ import pyupbit
 import time
 import datetime
 
+# 장 시작시간과 종료시간은 00:00:00 ~ 11:59:59로 설정
+
+# 목표가 계산
 def get_target_price(ticker, k):
     data = pyupbit.get_ohlcv(ticker)
 
@@ -18,7 +21,7 @@ def get_target_price(ticker, k):
 
 # 현재 시간
 now = datetime.datetime.now()
-# 시작 시간 (=자정)
+# 시작 시간
 openTime = datetime.datetime(now.year, now.month, now.day) + datetime.timedelta(1)
 # 목표가
 targetPrice = get_target_price("KRW-BTC", 0.5)
@@ -28,7 +31,8 @@ while True:
     if openTime < now < openTime + datetime.timedelta(seconds=5) :
         targetPrice = get_target_price("KRW-BTC", 0.5)
         openTime = datetime.datetime(now.year, now.month, now.day) + datetime.timedelta(1)
-        currentPrice = pyupbit.get_current_price("KRW-BTC")
-        print(currentPrice)
+        
+    currentPrice = pyupbit.get_current_price("KRW-BTC")
+    print(currentPrice)
 
     time.sleep(1)
