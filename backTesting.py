@@ -69,14 +69,18 @@ class backTesting :
         self.result()
 
     def result(self) :
-        print('테스트 종료')
+        print('='*40)
+        print('테스트 결과')
+        print('-'*40)
         print('총 거래 횟수 : %s' %self.trade_count)
-        print('승리 횟수 : %s, 승률 : %s' %(self.win_count, self.win_count / self.trade_count * 100))
+        print('승리 횟수 : %s' %self.win_count)
+        print('승률 : %s' %(self.win_count / self.trade_count * 100))
         print('누적 수익률 : %s' %self.accumulated_ror)
         print('현재 잔액 : %s' % self.current_cash)
         print('최고 잔액 : %s' % self.highest_cash)
         print('최저 잔액 : %s' % self.lowest_cash)
         print('최대 낙폭 (MDD) : %s' % self.mdd)
+        print('='*40)
 
 df = pyupbit.get_ohlcv("KRW-BTC", count=180) # 일봉 데이터
 backtest = backTesting(df, 1000000)
