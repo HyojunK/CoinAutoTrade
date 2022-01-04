@@ -11,8 +11,6 @@ class backTesting :
         self.current_cash = start_cash # 현재 자산
         self.highest_cash = start_cash # 자산 최고점
         self.lowest_cash = start_cash # 자산 최저점
-        self.recent_high_cash = start_cash # 자산 전고점
-        self.recent_low_cash = start_cash # 자산 전저점
 
         self.ror = 1 # 수익률
         self.accumulated_ror = 1 # 누적 수익률
@@ -54,17 +52,9 @@ class backTesting :
             # 자산 최저점 갱신
             self.lowest_cash = min(self.lowest_cash, self.current_cash)
 
-            # 자산 전고점 갱신
-            if(self.recent_high_cash <= self.current_cash) :
-                self.recent_high_cash = self.current_cash
-                self.recent_low_cash = self.current_cash
-
-            # 자산 전저점 갱신
-            if(self.recent_low_cash >= self.current_cash) :
-                self.recent_low_cash = self.current_cash
-                dd = (self.recent_high_cash - self.recent_low_cash) / self.recent_high_cash * 100
-                self.mdd = max(self.mdd, dd)
-
+            # 최대 낙폭 계산
+            dd = (self.highest_cash - self.current_cash) / self.highest_cash * 100
+            self.mdd = max(self.mdd, dd)
 
         self.result()
 
