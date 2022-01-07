@@ -21,15 +21,19 @@ class backTesting :
 
     def execute(self) :
         K = 0.5
-        
+
         # 변동폭 ( 고가 - 저가 )
         self.daily_data['range'] = self.daily_data['high'] - self.daily_data['low']
         # 목표매수가 ( 시가 + 변동폭 * K )
         self.daily_data['targetPrice'] = self.daily_data['open'] + self.daily_data['range'].shift(1) * K
+        # 5일 이동평균선
+        self.daily_data['ma5'] = self.daily_data['close'].rolling(window=5, min_periods=1).mean().shift(1)
+        # 상승장 여부
+        self.daily_data['bull'] = self.daily_data['open'] > self.daily_data['ma5']
 
         for idx, row in df.iterrows() :
             # 매수 신호 확인
-            self.buy_signal = np.where(row['low'] <= row['targetPrice'] <= row['high'], True, False) # 목표가에 달성한 경우 목표가에 매수해 다음날 시가에 매도한 것으로 판단
+            self.buy_signal = np.where((row['targetPrice'] <= row['high']) & row['bull'], True, False) # 목표가에 달성한 경우 목표가에 매수해 다음날 시가에 매도한 것으로 판단 + 상승장 조건 추가
 
             # 거래횟수 계산
             self.trade_count += 1 if self.buy_signal else 0
