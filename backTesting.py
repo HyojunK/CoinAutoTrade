@@ -20,12 +20,16 @@ class backTesting :
         self.win_count = 0 # 승리횟수
 
     def execute(self) :
-        K = 0.5
+
+        # 노이즈 계산 ( 1- 절대값(시가 - 종가) / (고가 - 저가) )
+        self.daily_data['noise'] = 1 - abs(self.daily_data['open'] - self.daily_data['close']) / (self.daily_data['high'] - self.daily_data['low'])
+        # 노이즈 20일 평균
+        self.daily_data['noise_ma20'] = self.daily_data['noise'].rolling(window=20, min_periods=1).mean()
 
         # 변동폭 ( 고가 - 저가 )
         self.daily_data['range'] = self.daily_data['high'] - self.daily_data['low']
         # 목표매수가 ( 시가 + 변동폭 * K )
-        self.daily_data['targetPrice'] = self.daily_data['open'] + self.daily_data['range'].shift(1) * K
+        self.daily_data['targetPrice'] = self.daily_data['open'] + self.daily_data['range'].shift(1) * self.daily_data['noise_ma20']
         # 5일 이동평균선
         self.daily_data['ma5'] = self.daily_data['close'].rolling(window=5, min_periods=1).mean().shift(1)
         # 상승장 여부
