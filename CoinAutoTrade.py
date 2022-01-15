@@ -2,11 +2,7 @@ import pyupbit
 import time
 import datetime
 import math
-
-acc_key = input("ACCESS KEY : ")
-sec_key = input("SECRET KEY : ")
-
-upbit = pyupbit.Upbit(acc_key, sec_key)
+import requests
 
 class autoTrade :
     def __init__(self, start_cash, ticker) :
@@ -22,6 +18,7 @@ class autoTrade :
 
     def start(self) :
         now = datetime.datetime.now() # 현재 시간
+        slackBot.message("자동 매매 프로그램이 시작되었습니다\n시작 시간 : " + str(now) + "\n매매 대상 : " + self.ticker + "\n시작 자산 : " + str(self.start_cash))
         openTime = datetime.datetime(now.year, now.month, now.day) + datetime.timedelta(1) # 자정
 
         while True :
@@ -37,7 +34,7 @@ class autoTrade :
                 if((current_price >= self.target_price) and self.bull and not self.buy_yn) : # 매수 시도
                     self.buy_coin()
             except :
-                print("error!")
+                slackBot.message("!!! 프로그램 오류 발생 !!!")
 
             time.sleep(1)
 
@@ -70,12 +67,39 @@ class autoTrade :
             upbit.buy_market_order(self.ticker, balance * 0.9995)
             self.buy_yn = True
 
+            buy_price = pyupbit.get_orderbook("KRW-BTC")['orderbook_units'][0]['ask_price'] # 최우선 매도 호가
+            slackBot.message("#매수 주문\n매수 주문 가격 : " + buy_price + "원")
+
     def sell_coin(self) :
         balance = upbit.get_balance("KRW_BTC") # 잔고 조회
 
         upbit.sell_market_order(ticker, balance)
         self.buy_yn = False
 
+        sell_price = pyupbit.get_orderbook("KRW-BTC")['orderbook_units'][0]['bid_price'] # 최우선 매수 호가
+        slackBot.message("#매도 주문\n매도 주문 가격 : " + sell_price + "원")
+
+class slack :
+    def __init__(self, token, channel) :
+        self.token = token
+        self.channel = channel
+
+    def message(self, message):
+        response = requests.post("https://slack.com/api/chat.postMessage",
+        headers={"Authorization": "Bearer " + self.token},
+        data={"channel": self.channel,"text": message}
+    )
+
+acc_key = input("ACCESS KEY : ")
+sec_key = input("SECRET KEY : ")
+
+upbit = pyupbit.Upbit(acc_key, sec_key)
+
+appToken = input("SLACK BOT TOKEN : ")
+channel = "#coinautotrade"
+slackBot = slack(appToken, channel)
+
+start_cash = upbit.get_balance()
 ticker = "KRW-BTC"
-# tradingBot = autoTrade(1000000, ticker)
-# today_data = tradingBot.start()
+tradingBot = autoTrade(start_cash, ticker)
+tradingBot.start()
