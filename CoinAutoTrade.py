@@ -3,8 +3,8 @@ import time
 import datetime
 import math
 
-acc_key = "ACCESS KEY"
-sec_key = "SECRET KEY"
+acc_key = input("ACCESS KEY : ")
+sec_key = input("SECRET KEY : ")
 
 upbit = pyupbit.Upbit(acc_key, sec_key)
 
@@ -14,17 +14,9 @@ class autoTrade :
         self.target_price = 0 # 목표 매수가
         self.bull = False # 상승장 여부
         self.ticker = ticker # 티커
-        
         self.buy_yn = False # 매수 여부
+
         self.start_cash = start_cash # 시작 자산
-        self.current_cash = start_cash # 현재 자산
-        self.highest_cash = start_cash # 자산 최고점
-        self.lowest_cash = start_cash # 자산 최저점
-
-        self.ror = 1 # 수익률
-
-        self.trade_count = 0 # 거래횟수
-        self.win_count = 0 # 승리횟수
 
         self.get_today_data()
 
@@ -33,16 +25,19 @@ class autoTrade :
         openTime = datetime.datetime(now.year, now.month, now.day) + datetime.timedelta(1) # 자정
 
         while True :
-            now = datetime.datetime.now()
+            try :
+                now = datetime.datetime.now()
 
-            if openTime < now < openTime + datetime.timedelta(seconds=5) :
-                openTime = datetime.datetime(now.year, now.month, now.day) + datetime.timedelta(1)
-                self.sell_coin() # 매도 시도
-                self.get_today_data() # 데이터 갱신
+                if openTime < now < openTime + datetime.timedelta(seconds=5) :
+                    openTime = datetime.datetime(now.year, now.month, now.day) + datetime.timedelta(1)
+                    self.sell_coin() # 매도 시도
+                    self.get_today_data() # 데이터 갱신
 
-            current_price = pyupbit.get_current_price(self.ticker)
-            if((current_price >= self.target_price) and self.bull and not self.buy_yn) : # 매수 시도
-                self.buy_coin()
+                current_price = pyupbit.get_current_price(self.ticker)
+                if((current_price >= self.target_price) and self.bull and not self.buy_yn) : # 매수 시도
+                    self.buy_coin()
+            except :
+                print("error!")
 
             time.sleep(1)
 
