@@ -100,8 +100,6 @@ with open("key_info.txt") as f :
 upbit = pyupbit.Upbit(acc_key, sec_key)
 slackBot = slack(app_token, channel)
 
-slackBot.message("모바일 테스트")
-
 start_cash = upbit.get_balance()
 ticker = "KRW-BTC"
 tradingBot = autoTrade(start_cash, ticker)
