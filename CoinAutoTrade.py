@@ -90,14 +90,17 @@ class slack :
         data={"channel": self.channel,"text": message}
     )
 
-acc_key = input("ACCESS KEY : ")
-sec_key = input("SECRET KEY : ")
+with open("key_info.txt") as f :
+    lines = f.readlines()
+    acc_key = lines[0].strip()    # Access Key
+    sec_key = lines[1].strip()    # Secret Key
+    app_token = lines[2].strip()  # App Token
+    channel = lines[3].strip()    # Slack Channel Name
 
 upbit = pyupbit.Upbit(acc_key, sec_key)
+slackBot = slack(app_token, channel)
 
-appToken = input("SLACK BOT TOKEN : ")
-channel = "#coinautotrade"
-slackBot = slack(appToken, channel)
+slackBot.message("모바일 테스트")
 
 start_cash = upbit.get_balance()
 ticker = "KRW-BTC"
