@@ -3,6 +3,7 @@ import time
 import datetime
 import math
 import requests
+import traceback
 
 class autoTrade :
     def __init__(self, start_cash, ticker) :
@@ -27,14 +28,16 @@ class autoTrade :
 
                 if openTime < now < openTime + datetime.timedelta(seconds=5) :
                     openTime = datetime.datetime(now.year, now.month, now.day) + datetime.timedelta(1)
-                    self.sell_coin() # 매도 시도
+                    if(self.buy_yn) :
+                        self.sell_coin() # 매도 시도
                     self.get_today_data() # 데이터 갱신
 
                 current_price = pyupbit.get_current_price(self.ticker)
                 if((current_price >= self.target_price) and self.bull and not self.buy_yn) : # 매수 시도
                     self.buy_coin()
-            except :
+            except:
                 slackBot.message("!!! 프로그램 오류 발생 !!!")
+                traceback.print_exc()
 
             time.sleep(1)
 
